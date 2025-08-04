@@ -10,7 +10,7 @@ public class Photo_Controller {
         this.vue = vue;
         this.clientData = null;
 
-        vue.getValiderBtn().addActionListener(_ -> validerClient());
+        vue.getValiderBtn().addActionListener(e-> validerClient());
     }
 
     private void validerClient() {

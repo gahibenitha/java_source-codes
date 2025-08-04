@@ -10,41 +10,65 @@ public class Login_View extends JFrame {
 
     public Login_View() {
         setTitle("Connexion");
-        setSize(300, 250);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setLayout(null);
 
-        JLabel emailLabel = new JLabel("Email:");
-        emailLabel.setBounds(30, 30, 80, 25);
-        add(emailLabel);
-
-        emailField = new JTextField();
-        emailField.setBounds(100, 30, 150, 25);
-        add(emailField);
-
-        JLabel passwordLabel = new JLabel("Mot de passe:");
-        passwordLabel.setBounds(10, 70, 100, 25);
-        add(passwordLabel);
-
-        passwordField = new JPasswordField();
-        passwordField.setBounds(100, 70, 150, 25);
-        add(passwordField);
-
-        JLabel roleLabel = new JLabel("Rôle:");
-        roleLabel.setBounds(30, 110, 80, 25);
-        add(roleLabel);
-
-        String[] roles = {"Administrateur", "Utilisateur"};
-        roleComboBox = new JComboBox<>(roles);
-        roleComboBox.setBounds(100, 110, 150, 25);
-        add(roleComboBox);
-
-        loginButton = new JButton("Connexion");
-        loginButton.setBounds(100, 150, 150, 25);
-        add(loginButton);
+        initComponents();
+        pack();  // Ajuste la taille selon les composants
     }
 
+    private void initComponents() {
+        JLabel emailLabel = new JLabel("Email:");
+        emailField = new JTextField(20);
+
+        JLabel passwordLabel = new JLabel("Mot de passe:");
+        passwordField = new JPasswordField(20);
+
+        JLabel roleLabel = new JLabel("Rôle:");
+        String[] roles = {"Administrateur", "Utilisateur"};
+        roleComboBox = new JComboBox<>(roles);
+
+        loginButton = new JButton("Connexion");
+
+        // Utilisation de GroupLayout pour un bon positionnement
+        JPanel panel = new JPanel();
+        GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setHorizontalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                    .addComponent(emailLabel)
+                    .addComponent(passwordLabel)
+                    .addComponent(roleLabel))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(emailField)
+                    .addComponent(passwordField)
+                    .addComponent(roleComboBox)
+                    .addComponent(loginButton, GroupLayout.Alignment.CENTER))
+        );
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(emailLabel)
+                    .addComponent(emailField))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(passwordLabel)
+                    .addComponent(passwordField))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(roleLabel)
+                    .addComponent(roleComboBox))
+                .addComponent(loginButton)
+        );
+
+        add(panel);
+    }
+
+    // Getters pour contrôleur
     public JTextField getEmailField() { return emailField; }
     public JPasswordField getPasswordField() { return passwordField; }
     public JButton getLoginButton() { return loginButton; }

@@ -1,27 +1,27 @@
 package view;
-import javax.swing.*;
+
 import java.awt.*;
-//import java.awt.event.*;
 import java.util.ArrayList;
+import javax.swing.*;
 
 public class MontageVideo_View {
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            new UserInterface();
-        });
+        SwingUtilities.invokeLater(UserInterface::new);
     }
 }
 
-// Panel personnalisé avec image de fond
+// Panel personnalisé pour afficher une image de fond
 class BackgroundPanel extends JPanel {
-    private Image backgroundImage;
+    private final Image backgroundImage;
 
     public BackgroundPanel(String imagePath) {
+        Image temp = null;
         try {
-            backgroundImage = new ImageIcon(imagePath).getImage();
+            temp = new ImageIcon(imagePath).getImage();
         } catch (Exception e) {
-            System.out.println("Erreur de chargement de l'image : " + e.getMessage());
+            System.out.println("❌ Erreur lors du chargement de l'image : " + e.getMessage());
         }
+        this.backgroundImage = temp;
     }
 
     @Override
@@ -33,34 +33,42 @@ class BackgroundPanel extends JPanel {
     }
 }
 
+// Interface principale pour l'utilisateur
 class UserInterface extends JFrame {
-    private ArrayList<String> userChoices = new ArrayList<>();
+    private final ArrayList<String> userChoices = new ArrayList<>();
 
     public UserInterface() {
-        setTitle("Interface de Montage Vidéo - Utilisateur");
+        setTitle("🎬 Interface de Montage Vidéo - Utilisateur");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Utiliser un JPanel avec image de fond
+        // Panneau avec image de fond
         BackgroundPanel panel = new BackgroundPanel("background.jpg");
         panel.setLayout(new GridLayout(4, 1, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JButton effetsSpeciauxBtn = new JButton("Effets Spéciaux");
-        JButton ajoutMusiqueBtn = new JButton("Ajout Musique");
-        JButton ajoutTexteBtn = new JButton("Ajout Texte");
-        JButton validerBtn = new JButton("Valider et Voir Admin");
+        // Boutons de choix
+        JButton effetsSpeciauxBtn = new JButton("✨ Effets Spéciaux");
+        JButton ajoutMusiqueBtn = new JButton("🎵 Ajout Musique");
+        JButton ajoutTexteBtn = new JButton("📝 Ajout Texte");
+        JButton validerBtn = new JButton("✅ Valider et Voir Admin");
 
-        effetsSpeciauxBtn.addActionListener(_ -> userChoices.add("Effets Spéciaux"));
-        ajoutMusiqueBtn.addActionListener(_ -> userChoices.add("Ajout Musique"));
-        ajoutTexteBtn.addActionListener(_ -> userChoices.add("Ajout Texte"));
+        // Actions des boutons
+        effetsSpeciauxBtn.addActionListener(e -> userChoices.add("Effets Spéciaux"));
+        ajoutMusiqueBtn.addActionListener(e -> userChoices.add("Ajout Musique"));
+        ajoutTexteBtn.addActionListener(e -> userChoices.add("Ajout Texte"));
 
-        validerBtn.addActionListener(_ -> {
-            new AdminInterface(userChoices);
-            dispose();
+        validerBtn.addActionListener(e -> {
+            if (userChoices.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Veuillez faire au moins un choix avant de valider.");
+            } else {
+                new AdminInterface(userChoices);
+                dispose();
+            }
         });
 
+        // Ajout des boutons au panel
         panel.add(effetsSpeciauxBtn);
         panel.add(ajoutMusiqueBtn);
         panel.add(ajoutTexteBtn);
@@ -71,24 +79,28 @@ class UserInterface extends JFrame {
     }
 }
 
+// Interface Admin pour afficher les choix de l'utilisateur
 class AdminInterface extends JFrame {
     public AdminInterface(ArrayList<String> choices) {
-        setTitle("Interface Admin - Choix de l'Utilisateur");
-        setSize(400, 200);
+        setTitle("🛠 Interface Admin - Choix de l'Utilisateur");
+        setSize(400, 250);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         BackgroundPanel panel = new BackgroundPanel("background.jpg");
         panel.setLayout(new BorderLayout());
 
+        // Zone d'affichage
         JTextArea displayArea = new JTextArea();
         displayArea.setEditable(false);
-        displayArea.setOpaque(false); // Rendre transparent
-        displayArea.setForeground(Color.WHITE); // Texte blanc
+        displayArea.setOpaque(false);
+        displayArea.setForeground(Color.WHITE);
+        displayArea.setFont(new Font("SansSerif", Font.PLAIN, 14));
 
-        StringBuilder sb = new StringBuilder("L'utilisateur a choisi :\n");
+        // Affichage des choix
+        StringBuilder sb = new StringBuilder("📋 L'utilisateur a choisi :\n\n");
         for (String choice : choices) {
-            sb.append("- ").append(choice).append("\n");
+            sb.append("• ").append(choice).append("\n");
         }
         displayArea.setText(sb.toString());
 

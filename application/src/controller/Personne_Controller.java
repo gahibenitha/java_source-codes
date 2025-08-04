@@ -1,12 +1,9 @@
 package controller;
 
-import javax.swing.*;
 import java.util.ArrayList;
-import view.Personne_View;
+import javax.swing.*;
 import modele.Personne;
-import modele.Photographe;
-import modele.Videographe;
-import modele.Client;
+import view.Personne_View;
 
 public class Personne_Controller {
     private final ArrayList<Personne> personnes;
@@ -15,12 +12,14 @@ public class Personne_Controller {
     public Personne_Controller(Personne_View vue) {
         this.vue = vue;
         this.personnes = new ArrayList<>();
+        initControllers();
+    }
 
-        // Gestionnaires d'événements
-        vue.getAjouterBtn().addActionListener(_-> ajouterPersonne());
-        vue.getModifierBtn().addActionListener(_-> modifierPersonne());
-        vue.getSupprimerBtn().addActionListener(_ -> supprimerPersonne());
-        vue.getAfficherBtn().addActionListener(_ -> afficherPersonnes());
+    private void initControllers() {
+        vue.getAjouterBtn().addActionListener(e -> ajouterPersonne());
+        vue.getModifierBtn().addActionListener(e -> modifierPersonne());
+        vue.getSupprimerBtn().addActionListener(e -> supprimerPersonne());
+        vue.getAfficherBtn().addActionListener(e -> afficherPersonnes());
     }
 
     private void ajouterPersonne() {
@@ -30,56 +29,84 @@ public class Personne_Controller {
         String tel = vue.getTelField().getText().trim();
         String type = (String) vue.getTypeCombo().getSelectedItem();
 
-        if (nom.isEmpty() || prenom.isEmpty() || email.isEmpty() || tel.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Veuillez remplir tous les champs.");
+        if (!validerChamps(nom, prenom, email, tel)) return;
+        if (type == null) {
+            afficherErreur("Veuillez sélectionner un type de personne.");
             return;
         }
 
-        Personne p;
-        switch (type) {
-            case "Photographe" -> p = new Photographe(nom, prenom, email, tel);
-            case "Vidéographe" -> p = new Videographe(nom, prenom, email, tel);
-            default -> p = new Client(nom, prenom, email, tel);
+        try {
+            Personne p = creerPersonneSelonType(type, nom, prenom, email, tel);
+            personnes.add(p);
+            afficherMessageSucces(type + " ajouté avec succès");
+            vue.clearFields();
+        } catch (Exception e) {
+            afficherErreur("Erreur lors de la création : " + e.getMessage());
         }
+    }
 
-        personnes.add(p);
-        JOptionPane.showMessageDialog(null, type + " ajouté !");
-        vue.clearFields();
+    private boolean validerChamps(String... champs) {
+        for (String champ : champs) {
+            if (champ == null || champ.isEmpty()) {
+                afficherErreur("Tous les champs sont obligatoires.");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private Personne creerPersonneSelonType(String type, String nom, String prenom, String email, String tel) {
+        // Pour l'instant on retourne juste une Personne, on pourrait étendre ici selon le type (Client, Agent, etc.)
+        return new Personne(nom, prenom, email, tel);
     }
 
     private void modifierPersonne() {
         String nom = vue.getNomField().getText().trim();
-        boolean found = false;
-        for (Personne p : personnes) {
-            if (p.getNom().equalsIgnoreCase(nom)) {
-                p.setPrenom(vue.getPrenomField().getText().trim());
-                p.setEmail(vue.getEmailField().getText().trim());
-                p.setTelephone(vue.getTelField().getText().trim());
-                JOptionPane.showMessageDialog(null, "✅ Données modifiées.");
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            JOptionPane.showMessageDialog(null, "❌ Personne non trouvée.");
-        }
+
+        personnes.stream()
+            .filter(p -> p.getNom().equalsIgnoreCase(nom))
+            .findFirst()
+            .ifPresentOrElse(
+                p -> {
+                    p.setPrenom(vue.getPrenomField().getText().trim());
+                    p.setEmail(vue.getEmailField().getText().trim());
+                    p.setTelephone(vue.getTelField().getText().trim());
+                    afficherMessageSucces("Données modifiées avec succès.");
+                },
+                () -> afficherErreur("Personne non trouvée.")
+            );
     }
 
     private void supprimerPersonne() {
         String nom = vue.getNomField().getText().trim();
         boolean removed = personnes.removeIf(p -> p.getNom().equalsIgnoreCase(nom));
+
         if (removed) {
-            JOptionPane.showMessageDialog(null, "🗑️ Personne supprimée.");
+            afficherMessageSucces("Personne supprimée avec succès.");
+            vue.clearFields();
         } else {
-            JOptionPane.showMessageDialog(null, "❌ Personne non trouvée.");
+            afficherErreur("Personne non trouvée.");
         }
     }
 
     private void afficherPersonnes() {
-        StringBuilder sb = new StringBuilder();
+        if (personnes.isEmpty()) {
+            vue.getAdminTextArea().setText("Aucune personne enregistrée.");
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder("Liste des personnes :\n\n");
         for (Personne p : personnes) {
-            sb.append(p).append("\n");
+            sb.append(p).append("\n\n");
         }
         vue.getAdminTextArea().setText(sb.toString());
+    }
+
+    private void afficherMessageSucces(String message) {
+        JOptionPane.showMessageDialog(vue, message, "Succès", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void afficherErreur(String message) {
+        JOptionPane.showMessageDialog(vue, message, "Erreur", JOptionPane.ERROR_MESSAGE);
     }
 }

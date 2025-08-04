@@ -1,16 +1,17 @@
 package controller;
+
 import javax.swing.*;
 import view.Photographe_View;
 
-
 public class Photographe_Controller {
-    private Photographe_View vue;
+    private final Photographe_View vue;
 
     public Photographe_Controller(Photographe_View vue) {
         this.vue = vue;
 
-        vue.getReserverBtn().addActionListener(_-> envoyerReservation());
-        vue.getConfirmerBtn().addActionListener(_-> confirmerReservation());
+        // Remplacement de `_` par `e` pour compatibilité Java 9+
+        vue.getReserverBtn().addActionListener(e -> envoyerReservation());
+        vue.getConfirmerBtn().addActionListener(e -> confirmerReservation());
     }
 
     private void envoyerReservation() {

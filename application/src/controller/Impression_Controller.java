@@ -1,32 +1,36 @@
 package controller;
 
-import view.Impression_View;
-import modele.Impression;
-
-import javax.swing.*;
 import java.util.ArrayList;
+import javax.swing.*;
+import modele.Impression;
+import view.Impression_View;
 
 public class Impression_Controller {
-    private Impression_View view;
-    private ArrayList<Impression> impressions;
+    private final Impression_View view;
+    private final ArrayList<Impression> impressions;
     private int nextId = 1;
 
     public Impression_Controller(Impression_View view) {
         this.view = view;
         this.impressions = new ArrayList<>();
 
-        // Lier les boutons à leurs actions (Assure-toi que les getters existent dans Impression_View)
-        view.getAjouterBtn().addActionListener(_-> insererImpression());
-        view.getModifierBtn().addActionListener(_ -> modifierImpression());
-        view.getSupprimerBtn().addActionListener(_ -> supprimerImpression());
-        view.getAfficherBtn().addActionListener(_ -> afficherImpressions());
+        // Lier les boutons à leurs actions avec noms valides
+        view.getAjouterBtn().addActionListener(e -> insererImpression());
+        view.getModifierBtn().addActionListener(e -> modifierImpression());
+        view.getSupprimerBtn().addActionListener(e -> supprimerImpression());
+        view.getAfficherBtn().addActionListener(e -> afficherImpressions());
     }
 
     private void insererImpression() {
         try {
-            int quantite = Integer.parseInt(view.getQuantiteField().getText());
+            int quantite = Integer.parseInt(view.getQuantiteField().getText().trim());
             String format = (String) view.getFormatBox().getSelectedItem();
             String papier = (String) view.getPapierBox().getSelectedItem();
+
+            if (format == null || papier == null) {
+                JOptionPane.showMessageDialog(view, "⚠️ Veuillez sélectionner un format et un type de papier.");
+                return;
+            }
 
             Impression imp = new Impression(nextId++, quantite, format, papier);
             impressions.add(imp);
@@ -40,12 +44,17 @@ public class Impression_Controller {
 
     private void modifierImpression() {
         try {
-            int id = Integer.parseInt(view.getIdField().getText());
+            int id = Integer.parseInt(view.getIdField().getText().trim());
             for (Impression imp : impressions) {
                 if (imp.getIdImpression() == id) {
-                    int quantite = Integer.parseInt(view.getQuantiteField().getText());
+                    int quantite = Integer.parseInt(view.getQuantiteField().getText().trim());
                     String format = (String) view.getFormatBox().getSelectedItem();
                     String papier = (String) view.getPapierBox().getSelectedItem();
+
+                    if (format == null || papier == null) {
+                        JOptionPane.showMessageDialog(view, "⚠️ Veuillez sélectionner un format et un type de papier.");
+                        return;
+                    }
 
                     imp.setQuantite(quantite);
                     imp.setFormat(format);
@@ -64,7 +73,7 @@ public class Impression_Controller {
 
     private void supprimerImpression() {
         try {
-            int id = Integer.parseInt(view.getIdField().getText());
+            int id = Integer.parseInt(view.getIdField().getText().trim());
             boolean removed = impressions.removeIf(imp -> imp.getIdImpression() == id);
             if (removed) {
                 JOptionPane.showMessageDialog(view, "🗑️ Impression supprimée !");
@@ -78,9 +87,13 @@ public class Impression_Controller {
     }
 
     private void afficherImpressions() {
-        view.setAdminOutput("📋 Liste des impressions :\n");
-        for (Impression imp : impressions) {
-            view.appendAdminOutput(imp.toString() + "\n");
+        if (impressions.isEmpty()) {
+            view.setAdminOutput("📋 Aucune impression enregistrée.\n");
+        } else {
+            view.setAdminOutput("📋 Liste des impressions :\n");
+            for (Impression imp : impressions) {
+                view.appendAdminOutput(imp.toString() + "\n");
+            }
         }
     }
 }

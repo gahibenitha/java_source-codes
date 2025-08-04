@@ -1,5 +1,5 @@
-
 package modele;
+
 public class Equipement {
     private int id;
     private String nom, marque, type, etat;
@@ -12,12 +12,15 @@ public class Equipement {
         this.etat = etat;
     }
 
+    // Getters
     public int getId() { return id; }
     public String getNom() { return nom; }
     public String getMarque() { return marque; }
     public String getType() { return type; }
     public String getEtat() { return etat; }
 
+    // Setters
+    public void setId(int id) { this.id = id; }
     public void setNom(String nom) { this.nom = nom; }
     public void setMarque(String marque) { this.marque = marque; }
     public void setType(String type) { this.type = type; }

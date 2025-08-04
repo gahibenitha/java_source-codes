@@ -2,201 +2,220 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import modele.Personne;
 
 public class Personne_View extends JFrame {
+    private static final String BG_IMAGE_PATH = "/view/background.jpg";
+    private static final String[] TYPES_PERSONNE = {"Client", "Photographe", "Vidéographe"};
 
-    // Liste des personnes pour l'administration
-    private ArrayList<Personne> personnes = new ArrayList<>();
     private JTextArea adminTextArea;
-
-    // Champs de saisie partagés
     private JTextField nomField, prenomField, emailField, telField;
     private JComboBox<String> typeCombo;
+    private JButton ajouterBtn, modifierBtn, supprimerBtn, afficherBtn;
 
-    // Boutons
-    private JButton ajouterBtn;
-    private JButton modifierBtn;
-    private JButton supprimerBtn;
-    private JButton afficherBtn;
-
-    // Interface principale
     public Personne_View() {
+        initUI();
+        setupWindow();
+    }
+
+    private void initUI() {
         setTitle("Application de Gestion - Client / Admin");
-        setSize(600, 500);
+        setSize(800, 600);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Onglets : Admin & Client
         JTabbedPane tabs = new JTabbedPane();
         tabs.add("Administrateur", createAdminPanel());
         tabs.add("Client", createClientPanel());
 
-        setContentPane(new BackgroundPanel("background.jpg"));
-        setLayout(new BorderLayout());
-        add(tabs, BorderLayout.CENTER);
+        BackgroundPanel backgroundPanel = new BackgroundPanel(BG_IMAGE_PATH);
+        backgroundPanel.setLayout(new BorderLayout());
+        backgroundPanel.add(tabs, BorderLayout.CENTER);
+        setContentPane(backgroundPanel);
+    }
+
+    private void setupWindow() {
         setVisible(true);
     }
 
-    // Panel Admin
     private JPanel createAdminPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setOpaque(false);
+        panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        // Champs de formulaire
-        JPanel formPanel = new JPanel(new GridLayout(6, 2, 5, 5));
+        panel.add(createFormPanel(), BorderLayout.NORTH);
+        panel.add(createButtonPanel(), BorderLayout.CENTER);
+        panel.add(createScrollPane(), BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    private JPanel createFormPanel() {
+        JPanel formPanel = new JPanel(new GridLayout(6, 2, 10, 10));
         formPanel.setOpaque(false);
 
-        nomField = new JTextField(20);
-        prenomField = new JTextField(20);
-        emailField = new JTextField(20);
-        telField = new JTextField(20);
+        nomField = createTextField();
+        prenomField = createTextField();
+        emailField = createTextField();
+        telField = createTextField();
+        typeCombo = new JComboBox<>(TYPES_PERSONNE);
 
-        typeCombo = new JComboBox<>(new String[]{"Client", "Photographe", "Vidéographe"});
+        addFormField(formPanel, "Nom :", nomField);
+        addFormField(formPanel, "Prénom :", prenomField);
+        addFormField(formPanel, "Email :", emailField);
+        addFormField(formPanel, "Téléphone :", telField);
+        addFormField(formPanel, "Type :", typeCombo);
 
-        formPanel.add(new JLabel("Nom :"));
-        formPanel.add(nomField);
-        formPanel.add(new JLabel("Prénom :"));
-        formPanel.add(prenomField);
-        formPanel.add(new JLabel("Email :"));
-        formPanel.add(emailField);
-        formPanel.add(new JLabel("Téléphone :"));
-        formPanel.add(telField);
-        formPanel.add(new JLabel("Type :"));
-        formPanel.add(typeCombo);
+        return formPanel;
+    }
 
-        // Boutons
-        JPanel buttonPanel = new JPanel();
+    private JTextField createTextField() {
+        JTextField field = new JTextField(20);
+        field.setFont(new Font("Arial", Font.PLAIN, 14));
+        return field;
+    }
+
+    private void addFormField(JPanel panel, String label, JComponent field) {
+        JLabel lbl = new JLabel(label);
+        lbl.setFont(new Font("Arial", Font.BOLD, 14));
+        panel.add(lbl);
+        panel.add(field);
+    }
+
+    private JPanel createButtonPanel() {
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
         buttonPanel.setOpaque(false);
 
-        ajouterBtn = new JButton("Ajouter");
-        modifierBtn = new JButton("Modifier");
-        supprimerBtn = new JButton("Supprimer");
-        afficherBtn = new JButton("Afficher");
+        ajouterBtn = createButton("Ajouter", Color.GREEN.darker());
+        modifierBtn = createButton("Modifier", Color.BLUE);
+        supprimerBtn = createButton("Supprimer", Color.RED);
+        afficherBtn = createButton("Afficher", Color.ORANGE);
 
         buttonPanel.add(ajouterBtn);
         buttonPanel.add(modifierBtn);
         buttonPanel.add(supprimerBtn);
         buttonPanel.add(afficherBtn);
 
-        // Zone d'affichage
-        adminTextArea = new JTextArea(10, 40);
+        return buttonPanel;
+    }
+
+    private JButton createButton(String text, Color bgColor) {
+        JButton btn = new JButton(text);
+        btn.setBackground(bgColor);
+        btn.setForeground(Color.WHITE);
+        btn.setFont(new Font("Arial", Font.BOLD, 12));
+        btn.setFocusPainted(false);
+        btn.setPreferredSize(new Dimension(120, 35));
+        return btn;
+    }
+
+    private JScrollPane createScrollPane() {
+        adminTextArea = new JTextArea(15, 50);
         adminTextArea.setEditable(false);
+        adminTextArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+
         JScrollPane scroll = new JScrollPane(adminTextArea);
-
-        panel.add(formPanel, BorderLayout.NORTH);
-        panel.add(buttonPanel, BorderLayout.CENTER);
-        panel.add(scroll, BorderLayout.SOUTH);
-
-        return panel;
+        scroll.setBorder(BorderFactory.createTitledBorder("Liste des Personnes"));
+        return scroll;
     }
 
-    // Panel Client (tu peux garder ton code actuel ici)
     private JPanel createClientPanel() {
-        JPanel panel = new JPanel(new GridLayout(6, 2, 5, 5));
+        JPanel panel = new JPanel(new GridBagLayout());
         panel.setOpaque(false);
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JTextField nom = new JTextField();
-        JTextField prenom = new JTextField();
-        JTextField email = new JTextField();
-        JTextField tel = new JTextField();
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        panel.add(new JLabel("Nom :"));
-        panel.add(nom);
-        panel.add(new JLabel("Prénom :"));
-        panel.add(prenom);
-        panel.add(new JLabel("Email :"));
-        panel.add(email);
-        panel.add(new JLabel("Téléphone :"));
-        panel.add(tel);
+        JTextField nom = createTextField();
+        JTextField prenom = createTextField();
+        JTextField email = createTextField();
+        JTextField tel = createTextField();
 
-        JButton validerBtn = new JButton("Valider");
-        validerBtn.addActionListener(_ -> {
-            JOptionPane.showMessageDialog(this,
-                    "Informations enregistrées :\n" + nom.getText() + " " + prenom.getText(),
-                    "Confirmation", JOptionPane.INFORMATION_MESSAGE);
-        });
+        addClientField(panel, gbc, "Nom :", nom, 0);
+        addClientField(panel, gbc, "Prénom :", prenom, 1);
+        addClientField(panel, gbc, "Email :", email, 2);
+        addClientField(panel, gbc, "Téléphone :", tel, 3);
 
-        panel.add(new JLabel(""));
-        panel.add(validerBtn);
+        gbc.gridy = 4;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        JButton validerBtn = createButton("Valider", new Color(0, 150, 0));
+        validerBtn.addActionListener(e-> showConfirmation(nom.getText(), prenom.getText()));
+        panel.add(validerBtn, gbc);
 
         return panel;
     }
 
-    // Getters publics pour que le contrôleur puisse accéder aux composants
-    public JTextField getNomField() {
-        return nomField;
+    private void addClientField(JPanel panel, GridBagConstraints gbc, String label, JTextField field, int row) {
+        gbc.gridx = 0;
+        gbc.gridy = row;
+        panel.add(new JLabel(label), gbc);
+
+        gbc.gridx = 1;
+        panel.add(field, gbc);
     }
 
-    public JTextField getPrenomField() {
-        return prenomField;
+    private void showConfirmation(String nom, String prenom) {
+        JOptionPane.showMessageDialog(this,
+            "<html><b>Informations enregistrées :</b><br>" +
+            nom + " " + prenom + "</html>",
+            "Confirmation",
+            JOptionPane.INFORMATION_MESSAGE);
     }
 
-    public JTextField getEmailField() {
-        return emailField;
-    }
+    // Getters
+    public JTextField getNomField() { return nomField; }
+    public JTextField getPrenomField() { return prenomField; }
+    public JTextField getEmailField() { return emailField; }
+    public JTextField getTelField() { return telField; }
+    public JComboBox<String> getTypeCombo() { return typeCombo; }
+    public JTextArea getAdminTextArea() { return adminTextArea; }
+    public JButton getAjouterBtn() { return ajouterBtn; }
+    public JButton getModifierBtn() { return modifierBtn; }
+    public JButton getSupprimerBtn() { return supprimerBtn; }
+    public JButton getAfficherBtn() { return afficherBtn; }
 
-    public JTextField getTelField() {
-        return telField;
-    }
-
-    public JComboBox<String> getTypeCombo() {
-        return typeCombo;
-    }
-
-    public JTextArea getAdminTextArea() {
-        return adminTextArea;
-    }
-
-    public JButton getAjouterBtn() {
-        return ajouterBtn;
-    }
-
-    public JButton getModifierBtn() {
-        return modifierBtn;
-    }
-
-    public JButton getSupprimerBtn() {
-        return supprimerBtn;
-    }
-
-    public JButton getAfficherBtn() {
-        return afficherBtn;
-    }
-
-    // Méthode pour vider les champs de saisie (appelée dans le contrôleur)
     public void clearFields() {
         nomField.setText("");
         prenomField.setText("");
         emailField.setText("");
         telField.setText("");
         typeCombo.setSelectedIndex(0);
+        nomField.requestFocus();
     }
 
-    // Fond d’écran personnalisé (classe interne)
-    class BackgroundPanel extends JPanel {
-        private Image background;
+    static class BackgroundPanel extends JPanel {
+        private final Image background;
 
         public BackgroundPanel(String path) {
-            try {
-                background = new ImageIcon(path).getImage();
-            } catch (Exception e) {
-                System.out.println("Erreur chargement fond : " + e.getMessage());
+            java.net.URL imgURL = getClass().getResource(path);
+            if (imgURL != null) {
+                background = new ImageIcon(imgURL).getImage();
+            } else {
+                System.err.println("Image non trouvée : " + path);
+                background = null;
             }
         }
 
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            if (background != null)
+            if (background != null) {
                 g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
+            }
         }
     }
 
-    // Tes classes Personne et dérivées peuvent rester en dehors de cette classe, dans leur propre fichier
-
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(Personne_View::new);
+        SwingUtilities.invokeLater(() -> {
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                new Personne_View();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 }
